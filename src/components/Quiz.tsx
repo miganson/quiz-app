@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   QuizProps,
@@ -23,7 +23,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   );
 
   const handleAnswer = (isCorrect: boolean) => {
-    setScore(isCorrect ? score + 1 : score);
+    setScore((prevScore) => (isCorrect ? prevScore + 1 : prevScore));
 
     const currentQuestion = getCurrentQuestion();
     const currentRoundTitle =
@@ -37,7 +37,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       question: currentQuestion?.stimulus || "",
       roundTitle: currentRoundTitle,
     };
-    setUserResponses([...userResponses, userResponse]);
+    setUserResponses((prevResponses) => [...prevResponses, userResponse]);
 
     const questionsOrRounds = desiredActivity?.questions ?? [];
     const currentQuestionsOrRounds = questionsOrRounds[currentRoundIndex];
@@ -46,10 +46,10 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       // This is a round
       const questions = (currentQuestionsOrRounds as NestedQuestion).questions;
       if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
       } else {
         if (currentRoundIndex < questionsOrRounds.length - 1) {
-          setCurrentRoundIndex(currentRoundIndex + 1);
+          setCurrentRoundIndex((prevIndex) => prevIndex + 1);
           setCurrentQuestionIndex(0);
         } else {
           navigate("/score", { state: { userResponses, score } });
@@ -58,12 +58,18 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     } else {
       // This is a question
       if (currentQuestionIndex < questionsOrRounds.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
       } else {
         navigate("/score", { state: { userResponses, score } });
       }
     }
   };
+
+  useEffect(() => {
+    if (currentQuestionIndex >= (desiredActivity?.questions ?? []).length) {
+      navigate("/score", { state: { userResponses, score } });
+    }
+  }, [currentQuestionIndex, desiredActivity?.questions, navigate, score, userResponses]);
 
   const getCurrentQuestion = () => {
     const questionsOrRounds = desiredActivity?.questions ?? [];
