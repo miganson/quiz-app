@@ -1,19 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  QuizProps,
-  Activity,
-  Question,
-  NestedQuestion,
-} from "../types/quizInterfaces";
+import { QuizProps, Activity, Question, NestedQuestion } from "../types/quizInterfaces";
 
 export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [userResponses, setUserResponses] = useState<
-    Array<{ is_correct: boolean; question: string; roundTitle: string }>
-  >([]);
+  const [userResponses, setUserResponses] = useState<Array<{ is_correct: boolean; question: string }>>([]);
   const navigate = useNavigate();
   const { activityId } = useParams();
   const activityIdAsNumber = activityId ? parseInt(activityId) : undefined;
@@ -23,78 +16,74 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   );
 
   const handleAnswer = (isCorrect: boolean) => {
-    setScore((prevScore) => (isCorrect ? prevScore + 1 : prevScore));
+    // Calculate the new score
+    setScore(isCorrect ? score + 1 : score);
 
+    // Update userResponses
     const currentQuestion = getCurrentQuestion();
-    const currentRoundTitle =
-      desiredActivity &&
-      ("round_title" in desiredActivity?.questions[currentRoundIndex] ?? {})
-        ? (desiredActivity.questions[currentRoundIndex] as NestedQuestion)
-            .round_title
-        : "";
     const userResponse = {
       is_correct: isCorrect,
-      question: currentQuestion?.stimulus || "",
-      roundTitle: currentRoundTitle,
+      question: currentQuestion?.stimulus || ''
     };
-    setUserResponses((prevResponses) => [...prevResponses, userResponse]);
+    setUserResponses([...userResponses, userResponse]);
 
-    const questionsOrRounds = desiredActivity?.questions ?? [];
-    const currentQuestionsOrRounds = questionsOrRounds[currentRoundIndex];
+    // Move to the next question
+    const questionsOrRounds = desiredActivity?.questions ?? []; // Default to empty array if questions is undefined
 
-    if ("questions" in currentQuestionsOrRounds) {
-      // This is a round
-      const questions = (currentQuestionsOrRounds as NestedQuestion).questions;
+    // Detect if we are dealing with rounds or direct questions
+    const isRounds = 'round_title' in (questionsOrRounds[0] || {});
+
+    if (isRounds) {
+      const currentRound = questionsOrRounds[currentRoundIndex] as NestedQuestion;
+      const questions = currentRound?.questions ?? [];
+
       if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else if (currentRoundIndex < questionsOrRounds.length - 1) {
+        setCurrentRoundIndex(currentRoundIndex + 1);
+        setCurrentQuestionIndex(0);
       } else {
-        if (currentRoundIndex < questionsOrRounds.length - 1) {
-          setCurrentRoundIndex((prevIndex) => prevIndex + 1);
-          setCurrentQuestionIndex(0);
-        } else {
-          navigate("/score", { state: { userResponses, score } });
-        }
+        navigate("/score", { state: { userResponses, score } });
       }
     } else {
-      // This is a question
-      if (currentQuestionIndex < questionsOrRounds.length - 1) {
-        setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+      const questions = questionsOrRounds as Question[];
+
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         navigate("/score", { state: { userResponses, score } });
       }
     }
   };
 
-  useEffect(() => {
-    if (currentQuestionIndex >= (desiredActivity?.questions ?? []).length) {
-      navigate("/score", { state: { userResponses, score } });
-    }
-  }, [currentQuestionIndex, desiredActivity?.questions, navigate, score, userResponses]);
-
-  const getCurrentQuestion = () => {
+  const getCurrentQuestion = (): Question | undefined => {
     const questionsOrRounds = desiredActivity?.questions ?? [];
-    const currentQuestionsOrRounds = questionsOrRounds[currentRoundIndex];
+    const isRounds = 'round_title' in (questionsOrRounds[0] || {});
+    const currentQuestions = isRounds ? (questionsOrRounds[currentRoundIndex] as NestedQuestion).questions : (questionsOrRounds as Question[]);
+    return currentQuestions[currentQuestionIndex];
+  }
 
-    if ("questions" in currentQuestionsOrRounds) {
-      // This is a round
-      const questions = (currentQuestionsOrRounds as NestedQuestion).questions;
-      return questions[currentQuestionIndex];
-    } else {
-      // This is a question
-      return currentQuestionsOrRounds;
-    }
+  const renderQuestion = (questionsOrRounds: (Question | NestedQuestion)[], roundIndex = 0) => {
+    const currentQuestion = getCurrentQuestion();
+
+    return (
+      <div>
+        {('round_title' in questionsOrRounds[roundIndex]) && <h1>{(questionsOrRounds[roundIndex] as NestedQuestion).round_title}</h1>}
+        <p>
+          {currentQuestion?.stimulus}
+        </p>
+        <button onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}>Correct</button>
+        <button onClick={() => handleAnswer(!currentQuestion?.is_correct)}>Incorrect</button>
+      </div>
+    );
   };
-
-  const currentQuestion = getCurrentQuestion();
 
   return (
     <div>
       {desiredActivity && (
         <div>
           <h1>{desiredActivity.activity_name}</h1>
-          <p>{currentQuestion?.stimulus}</p>
-          <button onClick={() => handleAnswer(true)}>Correct</button>
-          <button onClick={() => handleAnswer(false)}>Incorrect</button>
+          {renderQuestion(desiredActivity.questions, currentRoundIndex)}
         </div>
       )}
     </div>
