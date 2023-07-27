@@ -14,10 +14,6 @@ function App() {
       .catch((error) => console.log(error));
   }, []);
 
-  useEffect(() => {
-    console.log(quizData);
-  }, [quizData]);
-
   return (
     <Router>
       <Routes>

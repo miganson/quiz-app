@@ -6,6 +6,12 @@ const Score = () => {
 
   const navigate = useNavigate();
 
+  // Check if location.state is defined and has the required properties
+  if (!location.state || !location.state.userResponses || !location.state.score) {
+    navigate("/");
+    return null;
+  }
+
   const { userResponses, score } = location.state;
 
   const handleGoHomeClick = () => {
@@ -39,7 +45,7 @@ const Score = () => {
           {responsesGroupedByRound[roundTitle].map(
             (response: UserResponse, index: number) => (
               <p key={index}>
-                Q{index + 1}: {response.is_correct ? "Correct" : "Incorrect"}
+                Q{index + 1}: {response.question} - {response.is_correct ? "Correct" : "Incorrect"}
               </p>
             )
           )}
