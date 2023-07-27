@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   QuizProps,
@@ -23,20 +23,18 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   );
 
   const handleAnswer = (isCorrect: boolean) => {
-    // Calculate the new score
-    setScore(isCorrect ? score + 1 : score);
+    const updatedScore = isCorrect ? score + 1 : score;
+    setScore(updatedScore);
 
-    // Update userResponses
     const currentQuestion = getCurrentQuestion();
+    const questionsOrRoundsArray = desiredActivity?.questions ?? [];
 
-    // Move to the next question
-    const questionsOrRounds = desiredActivity?.questions ?? []; // Default to empty array if questions is undefined
+    // Boolean check if we are dealing with rounds or direct questions
+    const isRoundsArray = "round_title" in (questionsOrRoundsArray[0] || {});
 
-    // Detect if we are dealing with rounds or direct questions
-    const isRounds = "round_title" in (questionsOrRounds[0] || {});
-
-    const currentRoundTitle = isRounds
-      ? (questionsOrRounds[currentRoundIndex] as NestedQuestion).round_title
+    const currentRoundTitle = isRoundsArray
+      ? (questionsOrRoundsArray[currentRoundIndex] as NestedQuestion)
+          .round_title
       : "";
 
     const userResponse = {
@@ -49,32 +47,32 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     const updatedUserResponses = [...userResponses, userResponse];
     setUserResponses(updatedUserResponses);
 
-    if (isRounds) {
-      const currentRound = questionsOrRounds[
+    // to check if rounds Array or straight questions Array without rounds
+    if (isRoundsArray) {
+      const currentRound = questionsOrRoundsArray[
         currentRoundIndex
       ] as NestedQuestion;
       const questions = currentRound?.questions ?? [];
-
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
-      } else if (currentRoundIndex < questionsOrRounds.length - 1) {
+      } else if (currentRoundIndex < questionsOrRoundsArray.length - 1) {
+        //once all questions are answered in current round, bring index back to 0 and increase round index to move to next round
         setCurrentRoundIndex(currentRoundIndex + 1);
         setCurrentQuestionIndex(0);
       } else {
-        // Pass the updated user responses to the "/score" page
+        // Navigate to score after all rounds are passed through
         navigate("/score", {
-          state: { userResponses: updatedUserResponses, score },
+          state: { userResponses: updatedUserResponses, score: updatedScore },
         });
       }
     } else {
-      const questions = questionsOrRounds as Question[];
-
+      const questions = questionsOrRoundsArray as Question[];
       if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         // Pass the updated user responses to the "/score" page
         navigate("/score", {
-          state: { userResponses: updatedUserResponses, score },
+          state: { userResponses: updatedUserResponses, score: updatedScore },
         });
       }
     }
@@ -82,6 +80,8 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
 
   const getCurrentQuestion = (): Question | undefined => {
     const questionsOrRounds = desiredActivity?.questions ?? [];
+
+    // check if round_title is included in the array to use NestedQuestion or just Question. This is in case there are multiple rounds.
     const isRounds = "round_title" in (questionsOrRounds[0] || {});
     const currentQuestions = isRounds
       ? (questionsOrRounds[currentRoundIndex] as NestedQuestion).questions
