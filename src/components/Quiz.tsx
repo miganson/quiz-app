@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   QuizProps,
@@ -11,6 +11,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [isRoundTitleVisible, setIsRoundTitleVisible] = useState(true);
   const [userResponses, setUserResponses] = useState<
     Array<{ is_correct: boolean; question: string }>
   >([]);
@@ -59,6 +60,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
         //once all questions are answered in current round, bring index back to 0 and increase round index to move to next round
         setCurrentRoundIndex(currentRoundIndex + 1);
         setCurrentQuestionIndex(0);
+        setIsRoundTitleVisible(true); // Set the round title to visible for the next round
       } else {
         // Navigate to score after all rounds are passed through
         navigate("/score", {
@@ -93,15 +95,21 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     questionsOrRounds: (Question | NestedQuestion)[],
     roundIndex = 0
   ) => {
-    const currentQuestion = getCurrentQuestion();
-
-    return (
-      <div>
-        {"round_title" in questionsOrRounds[roundIndex] && (
+    //check if there are rounds to show what round it is before the questions are shown.
+    if (isRoundTitleVisible && "round_title" in questionsOrRounds[roundIndex]) {
+      return (
+        <div>
           <h1>
             {(questionsOrRounds[roundIndex] as NestedQuestion).round_title}
           </h1>
-        )}
+          <button onClick={() => setIsRoundTitleVisible(false)}>Next</button>
+        </div>
+      );
+    }
+
+    const currentQuestion = getCurrentQuestion();
+    return (
+      <div>
         <p>{currentQuestion?.stimulus}</p>
         <button
           onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}
