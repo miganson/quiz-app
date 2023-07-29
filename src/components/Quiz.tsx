@@ -6,15 +6,15 @@ import {
   Question,
   NestedQuestion,
 } from "../types/quizInterfaces";
+import { useUserResponses } from "../context/QuizContext";
 
 export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [isRoundTitleVisible, setIsRoundTitleVisible] = useState(true);
-  const [userResponses, setUserResponses] = useState<
-    Array<{ is_correct: boolean; question: string }>
-  >([]);
+  const { userResponses, setUserResponses } = useUserResponses();
+
   const navigate = useNavigate();
   const { activityId } = useParams();
   const activityIdAsNumber = activityId ? parseInt(activityId) : undefined;
@@ -28,8 +28,11 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     (activity) => activity.order === activityIdAsNumber
   );
 
+  const questionsOrRounds = desiredActivity?.questions ?? [];
+  const isRounds = "round_title" in (questionsOrRounds[0] || {});
+
   const handleAnswer = (isCorrect: boolean) => {
-    const updatedScore = isCorrect ? score + 1 : score;
+    const updatedScore = isCorrect ? (score ?? 0) + 1 : score;
     setScore(updatedScore);
 
     const currentQuestion = getCurrentQuestion();
@@ -49,9 +52,11 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       roundTitle: currentRoundTitle,
     };
 
-    // Create a new array for the updated user responses
-    const updatedUserResponses = [...userResponses, userResponse];
-    setUserResponses(updatedUserResponses);
+    const updatedUserResponses = userResponses 
+    ? [...userResponses, userResponse]
+    : [userResponse];
+
+  setUserResponses(updatedUserResponses);
 
     // to check if rounds Array or straight questions Array without rounds
     if (isRoundsArray) {
@@ -68,9 +73,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
         setIsRoundTitleVisible(true); // Set the round title to visible for the next round
       } else {
         // Navigate to score after all rounds are passed through
-        navigate("/score", {
-          state: { userResponses: updatedUserResponses, score: updatedScore },
-        });
+        navigate("/score");
       }
     } else {
       const questions = questionsOrRoundsArray as Question[];
@@ -78,16 +81,12 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         // Pass the updated user responses to the "/score" page
-        navigate("/score", {
-          state: { userResponses: updatedUserResponses, score: updatedScore },
-        });
+        navigate("/score");
       }
     }
   };
 
   const getCurrentQuestion = (): Question | undefined => {
-    const questionsOrRounds = desiredActivity?.questions ?? [];
-
     // check if round_title is included in the array to use NestedQuestion or just Question. This is in case there are multiple rounds.
     const isRounds = "round_title" in (questionsOrRounds[0] || {});
     const currentQuestions = isRounds
@@ -115,6 +114,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     const currentQuestion = getCurrentQuestion();
     return (
       <div>
+        <h2>Q: {currentQuestionIndex + 1}</h2>
         <p>{currentQuestion?.stimulus}</p>
         <button
           onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}
@@ -132,8 +132,11 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     <div>
       {desiredActivity && (
         <div>
-          <h1>{desiredActivity.activity_name}</h1>
-          {renderQuestion(desiredActivity.questions, currentRoundIndex)}
+          <h3>
+            {desiredActivity.activity_name}{" "}
+            {isRounds && <>/ Round: {currentRoundIndex + 1}</>}
+          </h3>
+          {renderQuestion(questionsOrRounds, currentRoundIndex)}
         </div>
       )}
     </div>

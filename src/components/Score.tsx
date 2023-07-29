@@ -1,18 +1,12 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useScore, useUserResponses } from "../context/QuizContext";
 import { UserResponse } from "../types/quizInterfaces";
 
 const Score = () => {
-  const location = useLocation();
+  const { score } = useScore(); // use context hook to get score
+  const { userResponses } = useUserResponses(); // use context hook to get userResponses
 
   const navigate = useNavigate();
-
-  // Check if location.state is defined and has the required properties
-  if (!location.state || !location.state.userResponses || !location.state.score) {
-    navigate("/");
-    return null;
-  }
-
-  const { userResponses, score } = location.state;
 
   const handleGoHomeClick = () => {
     navigate("/");
@@ -20,16 +14,18 @@ const Score = () => {
 
   // This helper function will return responses grouped by round titles
   const getResponsesGroupedByRound = () => {
-    const groupedResponses = userResponses.reduce(
-      (acc: { [key: string]: UserResponse[] }, response: UserResponse) => {
-        if (!acc[response.roundTitle]) {
-          acc[response.roundTitle] = [];
-        }
-        acc[response.roundTitle].push(response);
-        return acc;
-      },
-      {}
-    );
+    const groupedResponses = userResponses
+      ? userResponses.reduce(
+          (acc: { [key: string]: UserResponse[] }, response: UserResponse) => {
+            if (!acc[response.roundTitle]) {
+              acc[response.roundTitle] = [];
+            }
+            acc[response.roundTitle].push(response);
+            return acc;
+          },
+          {}
+        )
+      : {};
 
     return groupedResponses;
   };
@@ -45,7 +41,8 @@ const Score = () => {
           {responsesGroupedByRound[roundTitle].map(
             (response: UserResponse, index: number) => (
               <p key={index}>
-                Q{index + 1}: {response.question} - {response.is_correct ? "Correct" : "Incorrect"}
+                Q{index + 1}: {response.question} -{" "}
+                {response.is_correct ? "Correct" : "Incorrect"}
               </p>
             )
           )}
