@@ -1,8 +1,10 @@
 import React from "react";
 import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { Quiz } from "../components/Quiz";
+import { Quiz } from "../components/Quiz/Quiz";
 import { mockData } from "./mocks/mockData";
+
+jest.useFakeTimers();
 
 describe("Quiz component", () => {
   it("renders without crashing", () => {
@@ -32,12 +34,8 @@ describe("Quiz component", () => {
         </Routes>
       </MemoryRouter>
     );
-  
-    // If the activity has rounds, click the "Next" button to reveal the question
-    if (screen.queryByText("Next")) {
-      fireEvent.click(screen.getByText("Next"));
-    }
-  
+
+    jest.runAllTimers();
     await waitFor(() => {
       expect(
         screen.getByText("I really enjoy *to play football* with friends.")
@@ -46,7 +44,6 @@ describe("Quiz component", () => {
   });
 
   it("advances to the next question on button click (no rounds)", async () => {
-    // Extract only the first activity for this test case
     const mockDataNoRounds = {
       ...mockData,
       activities: [mockData.activities[0]],
@@ -63,8 +60,8 @@ describe("Quiz component", () => {
       </MemoryRouter>
     );
 
-    await screen.findByText("Correct"); // wait for the "Correct" button to appear
-    fireEvent.click(screen.getByText("Correct")); // simulate a click on the "Correct" button
+    await screen.findByText("Correct");
+    fireEvent.click(screen.getByText("Correct"));
 
     await waitFor(() => {
       expect(
@@ -74,7 +71,6 @@ describe("Quiz component", () => {
   });
 
   it("advances to the next question on button click (with rounds)", async () => {
-    // Extract only the second activity for this test case
     const mockDataWithRounds = {
       ...mockData,
       activities: [mockData.activities[1]],
@@ -91,15 +87,11 @@ describe("Quiz component", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByText("Next")); // simulate a click on the "Next" button
-    await waitFor(() => expect(screen.queryByText("Next")).toBeNull()); // wait for the "Next" button to disappear
+    jest.runAllTimers();
+    await screen.findByText("Correct");
+    fireEvent.click(screen.getByText("Correct"));
 
-    await screen.findByText("Correct"); // wait for the "Correct" button to appear
-    fireEvent.click(screen.getByText("Correct")); // simulate a click on the "Correct" button
-
-    await screen.findByText("Next"); // wait for the "Next" button to appear again
-    fireEvent.click(screen.getByText("Next")); // simulate a click on the "Next" button to reveal the next question
-
+    jest.runAllTimers();
     await waitFor(() => {
       expect(
         screen.getByText(

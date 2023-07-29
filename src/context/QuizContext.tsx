@@ -5,17 +5,25 @@ type QuizContextType = {
   setScore: (score: number) => void;
   userResponses: Array<{
     is_correct: boolean;
+    isUserAnswerCorrect: boolean;
     question: string;
     roundTitle: string;
+    activityNumber: number | undefined;
   }> | null;
   setUserResponses: React.Dispatch<
     React.SetStateAction<
-      Array<{ is_correct: boolean; question: string; roundTitle: string }>
+      Array<{
+        is_correct: boolean;
+        isUserAnswerCorrect: boolean;
+        question: string;
+        roundTitle: string;
+        activityNumber: number | undefined;
+      }>
     >
   >;
 };
 
-const QuizContext = createContext<QuizContextType>({
+export const QuizContext = createContext<QuizContextType>({
   score: null,
   setScore: () => {},
   userResponses: [],
@@ -29,7 +37,13 @@ type QuizProviderProps = {
 export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
   const [score, setScore] = useState<number>(0);
   const [userResponses, setUserResponses] = useState<
-    Array<{ is_correct: boolean; question: string; roundTitle: string }>
+    Array<{
+      is_correct: boolean;
+      isUserAnswerCorrect: boolean;
+      question: string;
+      roundTitle: string;
+      activityNumber: number | undefined;
+    }>
   >([]);
 
   return (

@@ -1,34 +1,58 @@
 import React from "react";
-import { render, fireEvent, screen } from "@testing-library/react";
+import { render as rtlRender, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import Score from "../components/Score";
+import Score from "../components/Score/Score";
+import { QuizProvider, QuizContext } from "../context/QuizContext";
+
+// This function takes an UI, options and wrapper component and returns render result
+function customRender(
+  ui: React.ReactElement,
+  { providerProps, ...renderOptions }: any
+) {
+  return rtlRender(
+    <QuizContext.Provider {...providerProps}>{ui}</QuizContext.Provider>,
+    renderOptions
+  );
+}
 
 describe("Score component", () => {
   it("renders without crashing", () => {
-    render(
-      <MemoryRouter
-        initialEntries={[
-          { pathname: "/score", state: { userResponses: [], score: 0 } },
-        ]}
-      >
+    customRender(
+      <MemoryRouter initialEntries={["/score"]}>
         <Routes>
           <Route path="/score" element={<Score />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        providerProps: {
+          value: {
+            userResponses: [],
+            score: 0,
+            setUserResponses: () => {},
+            setScore: () => {},
+          },
+        },
+      }
     );
   });
 
   it("displays the correct score", () => {
-    render(
-      <MemoryRouter
-        initialEntries={[
-          { pathname: "/score", state: { userResponses: [], score: 5 } },
-        ]}
-      >
+    customRender(
+      <MemoryRouter initialEntries={["/score"]}>
         <Routes>
           <Route path="/score" element={<Score />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        providerProps: {
+          value: {
+            userResponses: [],
+            score: 5,
+            setUserResponses: () => {},
+            setScore: () => {},
+          },
+        },
+      }
     );
     expect(screen.getByText("Your score: 5")).toBeInTheDocument();
   });
@@ -40,21 +64,35 @@ describe("Score component", () => {
       { roundTitle: "Round 2", question: "Question 3", is_correct: true },
     ];
 
-    render(
-      <MemoryRouter
-        initialEntries={[
-          { pathname: "/score", state: { userResponses, score: 2 } },
-        ]}
-      >
+    customRender(
+      <MemoryRouter initialEntries={["/score"]}>
         <Routes>
           <Route path="/score" element={<Score />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        providerProps: {
+          value: {
+            userResponses,
+            score: 2,
+            setUserResponses: () => {},
+            setScore: () => {},
+          },
+        },
+      }
     );
+
     expect(screen.getByText("Your score: 2")).toBeInTheDocument();
-    expect(screen.getByText("Q1: Question 1 - Correct")).toBeInTheDocument();
-    expect(screen.getByText("Q2: Question 2 - Incorrect")).toBeInTheDocument();
-    expect(screen.getByText("Q1: Question 3 - Correct")).toBeInTheDocument();
+
+    expect(
+      screen.getByText(/Q\s*1\s*:\s*Question 1\s*-\s*True/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Q\s*2\s*:\s*Question 2\s*-\s*False/)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Q\s*1\s*:\s*Question 3\s*-\s*True/)
+    ).toBeInTheDocument();
   });
 
   it("redirects to home when Go home button is clicked", async () => {
@@ -65,17 +103,23 @@ describe("Score component", () => {
     ];
     const Home = () => <div>Home Page</div>;
 
-    render(
-      <MemoryRouter
-        initialEntries={[
-          { pathname: "/score", state: { userResponses, score: 2 } },
-        ]}
-      >
+    customRender(
+      <MemoryRouter initialEntries={["/score"]}>
         <Routes>
           <Route path="/score" element={<Score />} />
           <Route path="/" element={<Home />} />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
+      {
+        providerProps: {
+          value: {
+            userResponses,
+            score: 2,
+            setUserResponses: () => {},
+            setScore: () => {},
+          },
+        },
+      }
     );
 
     const button = screen.getByRole("button", {

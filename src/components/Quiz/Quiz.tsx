@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   QuizProps,
   Activity,
   Question,
   NestedQuestion,
-} from "../types/quizInterfaces";
-import { useScore, useUserResponses } from "../context/QuizContext";
+} from "../../types/quizInterfaces";
+import { useScore, useUserResponses } from "../../context/QuizContext";
+import "./Quiz.css";
 
 export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -19,6 +20,12 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const { activityId } = useParams();
   const activityIdAsNumber = activityId ? parseInt(activityId) : undefined;
 
+  useEffect(() => {
+    if (isRoundTitleVisible) {
+      setTimeout(() => setIsRoundTitleVisible(false), 2000);
+    }
+  }, [isRoundTitleVisible]);
+
   if (!data) {
     navigate("/");
     return null;
@@ -27,6 +34,8 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const desiredActivity: Activity | undefined = data.activities.find(
     (activity) => activity.order === activityIdAsNumber
   );
+
+  console.log(desiredActivity);
 
   const questionsOrRounds = desiredActivity?.questions ?? [];
   const isRounds = "round_title" in (questionsOrRounds[0] || {});
@@ -46,9 +55,11 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       : "";
 
     const userResponse = {
-      is_correct: isCorrect,
+      is_correct: currentQuestion?.is_correct ?? false, // the actual answer
+      isUserAnswerCorrect: isCorrect,
       question: currentQuestion?.stimulus || "",
       roundTitle: currentRoundTitle,
+      activityNumber: activityIdAsNumber || 0,
     };
 
     const updatedUserResponses = userResponses
@@ -101,11 +112,10 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     //check if there are rounds to show what round it is before the questions are shown.
     if (isRoundTitleVisible && "round_title" in questionsOrRounds[roundIndex]) {
       return (
-        <div>
+        <div className="roundTitle">
           <h1>
             {(questionsOrRounds[roundIndex] as NestedQuestion).round_title}
           </h1>
-          <button onClick={() => setIsRoundTitleVisible(false)}>Next</button>
         </div>
       );
     }
@@ -113,25 +123,27 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     const currentQuestion = getCurrentQuestion();
     return (
       <div>
-        <h2>Q: {currentQuestionIndex + 1}</h2>
-        <p>{currentQuestion?.stimulus}</p>
-        <button
-          onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}
-        >
-          Correct
-        </button>
-        <button onClick={() => handleAnswer(!currentQuestion?.is_correct)}>
-          Incorrect
-        </button>
+        <h2 className="questionNumber">Q: {currentQuestionIndex + 1}</h2>
+        <p className="question">{currentQuestion?.stimulus}</p>
+        <div className="answers">
+          <div
+            onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}
+          >
+            Correct
+          </div>
+          <div onClick={() => handleAnswer(!currentQuestion?.is_correct)}>
+            Incorrect
+          </div>
+        </div>
       </div>
     );
   };
 
   return (
-    <div>
+    <div className="container">
       {desiredActivity && (
         <div>
-          <h3>
+          <h3 className="activityName">
             {desiredActivity.activity_name}{" "}
             {isRounds && <>/ Round: {currentRoundIndex + 1}</>}
           </h3>

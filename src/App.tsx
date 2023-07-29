@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Home from "./components/Home/Home";
-import Quiz from "./components/Quiz";
-import Score from "./components/Score";
+import Quiz from "./components/Quiz/Quiz";
+import Score from "./components/Score/Score";
 import { QuizProvider } from "./context/QuizContext";
 
 function App() {
