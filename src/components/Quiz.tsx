@@ -33,9 +33,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
 
   const handleAnswer = (isCorrect: boolean) => {
     const updatedScore = isCorrect ? (score ?? 0) + 1 : score ?? 0;
-    console.log("Before setting score: ", score);
     setScore(updatedScore);
-    console.log("After setting score: ", score);
     const currentQuestion = getCurrentQuestion();
     const questionsOrRoundsArray = desiredActivity?.questions ?? [];
 

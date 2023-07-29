@@ -24,7 +24,7 @@ describe("Quiz component", () => {
     expect(await screen.findByText("Activity One")).toBeInTheDocument();
   });
 
-  it("displays the current question", () => {
+  it("displays the current question", async () => {
     render(
       <MemoryRouter initialEntries={["/quiz/1"]}>
         <Routes>
@@ -32,7 +32,13 @@ describe("Quiz component", () => {
         </Routes>
       </MemoryRouter>
     );
-    return waitFor(() => {
+  
+    // If the activity has rounds, click the "Next" button to reveal the question
+    if (screen.queryByText("Next")) {
+      fireEvent.click(screen.getByText("Next"));
+    }
+  
+    await waitFor(() => {
       expect(
         screen.getByText("I really enjoy *to play football* with friends.")
       ).toBeInTheDocument();

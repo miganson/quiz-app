@@ -19,11 +19,11 @@ describe("Home component", () => {
         <Home data={mockData} />
       </MemoryRouter>
     );
-    expect(screen.getByText("Start Quiz Activity One")).toBeInTheDocument();
-    expect(screen.getByText("Start Quiz Activity Two")).toBeInTheDocument();
+    expect(screen.getByText("Activity One")).toBeInTheDocument();
+    expect(screen.getByText("Activity Two")).toBeInTheDocument();
   });
 
-  it("navigates to quiz on button click", () => {
+  it("navigates to quiz on button click", async  () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
@@ -33,7 +33,7 @@ describe("Home component", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByText("Start Quiz Activity One"));
-    expect(screen.getByText("Quiz Page")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Activity One"));
+    expect(await screen.findByText("Quiz Page")).toBeInTheDocument();
   });
 });
