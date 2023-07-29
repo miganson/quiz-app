@@ -2,19 +2,26 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import { HomeProps } from "../../types/quizInterfaces";
+import { useScore, useUserResponses } from "../../context/QuizContext";
 
 export const Home: React.FC<HomeProps> = ({ data }) => {
   const navigate = useNavigate();
+  const { setScore } = useScore();
+  const { setUserResponses } = useUserResponses();
 
   const handleButtonClick = (activityOrder: number) => {
     if (data) {
       const activity = data.activities.find(
         (activity) => activity.order === activityOrder
       );
-      if (activity) navigate("/quiz/" + activity.order);
+
+      if (activity) {
+        setScore(0); // reset the score
+        setUserResponses([]); // reset the userResponses
+        navigate("/quiz/" + activity.order);
+      }
     }
   };
-
   const handleResultsClick = () => {
     navigate("/score");
   };

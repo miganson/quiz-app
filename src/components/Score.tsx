@@ -6,6 +6,9 @@ const Score = () => {
   const { score } = useScore(); // use context hook to get score
   const { userResponses } = useUserResponses(); // use context hook to get userResponses
 
+  console.log(score);
+  console.log(userResponses);
+
   const navigate = useNavigate();
 
   const handleGoHomeClick = () => {

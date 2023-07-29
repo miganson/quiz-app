@@ -1,10 +1,18 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from "react";
 
 type QuizContextType = {
   score: number | null;
   setScore: (score: number) => void;
-  userResponses: Array<{ is_correct: boolean; question: string; roundTitle: string }> | null;
-  setUserResponses: React.Dispatch<React.SetStateAction<Array<{ is_correct: boolean; question: string; roundTitle: string }>>>;
+  userResponses: Array<{
+    is_correct: boolean;
+    question: string;
+    roundTitle: string;
+  }> | null;
+  setUserResponses: React.Dispatch<
+    React.SetStateAction<
+      Array<{ is_correct: boolean; question: string; roundTitle: string }>
+    >
+  >;
 };
 
 const QuizContext = createContext<QuizContextType>({
@@ -16,20 +24,27 @@ const QuizContext = createContext<QuizContextType>({
 
 type QuizProviderProps = {
   children: ReactNode;
-}
+};
 
 export const QuizProvider: React.FC<QuizProviderProps> = ({ children }) => {
-  const [score, setScore] = useState<number | null>(null);
-  const [userResponses, setUserResponses] = useState<Array<{ is_correct: boolean; question: string; roundTitle: string }>>([]);
-  
+  const [score, setScore] = useState<number>(0);
+  const [userResponses, setUserResponses] = useState<
+    Array<{ is_correct: boolean; question: string; roundTitle: string }>
+  >([]);
+
   return (
-    <QuizContext.Provider value={{ score, setScore, userResponses, setUserResponses }}>
+    <QuizContext.Provider
+      value={{ score, setScore, userResponses, setUserResponses }}
+    >
       {children}
     </QuizContext.Provider>
   );
 };
 
-export const useScore = (): { score: number | null; setScore: (score: number) => void } => {
+export const useScore = (): {
+  score: number | null;
+  setScore: (score: number) => void;
+} => {
   const { score, setScore } = useContext(QuizContext);
   return { score, setScore };
 };

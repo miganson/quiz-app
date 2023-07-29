@@ -6,12 +6,12 @@ import {
   Question,
   NestedQuestion,
 } from "../types/quizInterfaces";
-import { useUserResponses } from "../context/QuizContext";
+import { useScore, useUserResponses } from "../context/QuizContext";
 
 export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
-  const [score, setScore] = useState(0);
+  const { score, setScore } = useScore();
   const [isRoundTitleVisible, setIsRoundTitleVisible] = useState(true);
   const { userResponses, setUserResponses } = useUserResponses();
 
@@ -32,9 +32,10 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const isRounds = "round_title" in (questionsOrRounds[0] || {});
 
   const handleAnswer = (isCorrect: boolean) => {
-    const updatedScore = isCorrect ? (score ?? 0) + 1 : score;
+    const updatedScore = isCorrect ? (score ?? 0) + 1 : score ?? 0;
+    console.log("Before setting score: ", score);
     setScore(updatedScore);
-
+    console.log("After setting score: ", score);
     const currentQuestion = getCurrentQuestion();
     const questionsOrRoundsArray = desiredActivity?.questions ?? [];
 
@@ -52,11 +53,11 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       roundTitle: currentRoundTitle,
     };
 
-    const updatedUserResponses = userResponses 
-    ? [...userResponses, userResponse]
-    : [userResponse];
+    const updatedUserResponses = userResponses
+      ? [...userResponses, userResponse]
+      : [userResponse];
 
-  setUserResponses(updatedUserResponses);
+    setUserResponses(updatedUserResponses);
 
     // to check if rounds Array or straight questions Array without rounds
     if (isRoundsArray) {
