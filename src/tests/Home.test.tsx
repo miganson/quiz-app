@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import { Home } from "../components/Home";
+import { Home } from "../components/Home/Home";
 import { mockData } from "./mocks/mockData";
 
 describe("Home component", () => {

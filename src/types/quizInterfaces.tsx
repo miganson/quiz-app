@@ -34,3 +34,7 @@
     question: string;
     roundTitle: string;
   }
+
+  export interface HomeProps {
+    data: QuizData | null;
+  }

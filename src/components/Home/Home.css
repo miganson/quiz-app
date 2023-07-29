@@ -1,0 +1,19 @@
+
+.text-blue {
+    color: #52afec;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+  
+  .text-gray {
+    color: gray;
+    cursor: not-allowed;
+    margin-bottom: 10px;
+  }
+  
+  .home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  

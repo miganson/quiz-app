@@ -19,6 +19,11 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const { activityId } = useParams();
   const activityIdAsNumber = activityId ? parseInt(activityId) : undefined;
 
+  if (!data) {
+    navigate("/");
+    return null;
+  }
+
   const desiredActivity: Activity | undefined = data.activities.find(
     (activity) => activity.order === activityIdAsNumber
   );
