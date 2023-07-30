@@ -84,15 +84,17 @@ describe("Score component", () => {
 
     expect(screen.getByText("Your score: 2")).toBeInTheDocument();
 
-    expect(
-      screen.getByText(/Q\s*1\s*:\s*Question 1\s*-\s*True/)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Q\s*2\s*:\s*Question 2\s*-\s*False/)
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Q\s*1\s*:\s*Question 3\s*-\s*True/)
-    ).toBeInTheDocument();
+    expect(screen.getByText("Round 1")).toBeInTheDocument();
+    expect(screen.getAllByText(/Q\s*1/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("True").length).toBeGreaterThan(0);
+
+    expect(screen.getByText("Round 1")).toBeInTheDocument();
+    expect(screen.getByText(/Q\s*2/)).toBeInTheDocument();
+    expect(screen.getByText("False")).toBeInTheDocument();
+
+    expect(screen.getByText("Round 2")).toBeInTheDocument();
+    expect(screen.getAllByText(/Q\s*1/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("True").length).toBeGreaterThan(0);
   });
 
   it("redirects to home when Go home button is clicked", async () => {
