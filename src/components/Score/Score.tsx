@@ -1,13 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useScore, useUserResponses } from "../../context/QuizContext";
 import { UserResponse } from "../../types/quizInterfaces";
+import "./Score.css";
 
 const Score = () => {
   const { score } = useScore(); // use context hook to get score
   const { userResponses } = useUserResponses(); // use context hook to get userResponses
-
-  console.log(userResponses);
-
   const navigate = useNavigate();
 
   const handleGoHomeClick = () => {
@@ -39,25 +37,33 @@ const Score = () => {
 
   const responsesGroupedByRound = getResponsesGroupedByRound();
 
+  // can add response.question to add the specific question in mind
   return (
-    <div>
-      <h2>Results</h2>
-      <div>Activity: {activityNumber}</div>
-      {Object.keys(responsesGroupedByRound).map((roundTitle) => (
-        <div key={roundTitle}>
-          <h2>{roundTitle}</h2>
-          {responsesGroupedByRound[roundTitle].map(
-            (response: UserResponse, index: number) => (
-              <p key={index}>
-                Q{index + 1}: {response.question} -{" "}
-                {response.isUserAnswerCorrect ? "Correct" : (response.is_correct ? "True" : "False")}
-              </p>
-            )
-          )}
-        </div>
-      ))}
-      <h2>Your score: {score}</h2>
-      <button onClick={handleGoHomeClick}>Go home</button>
+    <div className="centered-container">
+        <h2 className="text-padding">Activity: {activityNumber}</h2>
+        <h1 className="text-padding">Results</h1>
+
+        {Object.keys(responsesGroupedByRound).map((roundTitle) => (
+          <div key={roundTitle}>
+            <h2 className="text-padding">{roundTitle}</h2>
+            {responsesGroupedByRound[roundTitle].map(
+              (response: UserResponse, index: number) => (
+                <div className="question-response-container" key={index}>
+                  <p className="text-padding">Q{index + 1}</p>
+                  <span className="bold-text text-padding">
+                    {response.isUserAnswerCorrect
+                      ? "Correct"
+                      : response.is_correct
+                      ? "True"
+                      : "False"}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        ))}
+        <h2 className="text-padding">Your score: {score}</h2>
+        <button onClick={handleGoHomeClick}>Home</button>
     </div>
   );
 };

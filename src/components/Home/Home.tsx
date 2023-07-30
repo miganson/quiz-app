@@ -1,8 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import numeral from "numeral";
 import "./Home.css";
 import { HomeProps } from "../../types/quizInterfaces";
 import { useScore, useUserResponses } from "../../context/QuizContext";
+// @ts-ignore
+import * as numberToWords from "number-to-words";
 
 export const Home: React.FC<HomeProps> = ({ data }) => {
   const navigate = useNavigate();
@@ -22,9 +25,20 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
       }
     }
   };
+
   const handleResultsClick = () => {
     navigate("/score");
   };
+
+  const capitalizeWords = (str: string) => {
+    return str
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
+  const numActivities =
+    data && data.activities ? Math.max(5, data.activities.length) : 5;
 
   return (
     <div className="home-container">
@@ -34,7 +48,7 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
           <h1 className="title">Error Find</h1>
         </div>
       </div>
-      {[1, 2, 3, 4, 5].map((order) => {
+      {Array.from({ length: numActivities }, (_, i) => i + 1).map((order) => {
         const activity = data?.activities.find(
           (activity) => activity.order === order
         );
@@ -46,12 +60,15 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
           >
             <div className="text-container">
               <div className={activity ? "text-blue" : "text-gray"}>
-                {activity ? activity.activity_name : `Quiz ${order}`}
+                {activity
+                  ? activity.activity_name
+                  : `Activity ${capitalizeWords(numberToWords.toWords(order))}`}
               </div>
             </div>
           </div>
         );
       })}
+
       <div className="text-container" onClick={handleResultsClick}>
         <h3 className="results">RESULTS</h3>
       </div>

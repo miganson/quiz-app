@@ -34,7 +34,7 @@ export interface UserResponse {
   isUserAnswerCorrect: boolean;
   question: string;
   roundTitle: string;
-  activityNumber: number | undefined; // Updated here
+  activityNumber: number | undefined;
 }
 
 export interface HomeProps {

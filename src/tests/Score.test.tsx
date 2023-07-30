@@ -123,7 +123,7 @@ describe("Score component", () => {
     );
 
     const button = screen.getByRole("button", {
-      name: "Go home",
+      name: "Home",
     });
     fireEvent.click(button); // Click the button
 

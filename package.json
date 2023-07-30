@@ -9,6 +9,8 @@
     "@types/node": "^16.18.39",
     "@types/react": "^18.2.16",
     "@types/react-dom": "^18.2.7",
+    "number-to-words": "^1.2.4",
+    "numeral": "^2.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.2",
@@ -42,6 +44,8 @@
   },
   "devDependencies": {
     "@testing-library/react": "^14.0.0",
+    "@types/number-to-words": "^1.2.1",
+    "@types/numeral": "^2.0.2",
     "@types/react-router-dom": "^5.3.3",
     "@types/styled-components": "^5.1.26",
     "jest": "^27.5.1"

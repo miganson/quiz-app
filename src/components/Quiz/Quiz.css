@@ -1,44 +1,48 @@
 .container {
-    width: 500px;
-    margin: 0 auto;
-    border: 1px solid #52afec;
-    box-sizing: border-box;
-    color: #52afec; /* Set the text color for the entire container */
-  }
-  
-  .activityName, .questionNumber, .question, .answers, .roundTitle {
-    padding: 20px;
-    text-align: left;
-  }
-  
-  .activityName {
-    /* Other unique styles for .activityName go here */
-  }
-  
-  .questionNumber {
-    margin-top: 20px;
-  }
-  
-  .question {
-    border-top: 1px solid #52afec;
-    border-bottom: 1px solid #52afec;
-    margin-top: 10px;
-  }
-  
-  .answers {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    cursor: pointer; /* Change the cursor when hovering over the answers */
-  }
-  
-  .answers div {
-    /* Styling for the clickable words */
-    border: none;
-    background: none;
-  }
-  
-  .roundTitle {
-    /* Add additional styles for roundTitle here if needed */
-  }
-  
+  width: 500px;
+  margin: 0 auto;
+  border: 1px solid #bce0fd;
+  box-sizing: border-box;
+  color: #2699fb; /* Set the text color for the entire container */
+  background-color: white;
+}
+
+.activityName,
+.questionNumber,
+.question,
+.answers,
+.roundTitle {
+  padding: 20px;
+  text-align: left;
+}
+
+.activityName {
+  /* Other unique styles for .activityName go here */
+}
+
+.questionNumber {
+  margin-top: 20px;
+}
+
+.question {
+  border-top: 1px solid #bce0fd;
+  border-bottom: 1px solid #bce0fd;
+  margin-top: 10px;
+}
+
+.answers {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  cursor: pointer; /* Change the cursor when hovering over the answers */
+}
+
+.answers div {
+  /* Styling for the clickable words */
+  border: none;
+  background: none;
+}
+
+.roundTitle {
+  /* Add additional styles for roundTitle here if needed */
+}

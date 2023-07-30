@@ -3,20 +3,22 @@ body {
   justify-content: center;
   align-items: center;
   height: 90vh;
+  background-color: #f1f9ff;
 }
 
 .home-container {
   display: flex;
   flex-direction: column;
-  border: 2px solid #52afec;
+  border: 2px solid #bce0fd;
+  background-color: white;
 }
 
 .line {
-  border-bottom: 1px solid #52afec;
+  border-bottom: 1px solid #bce0fd;
 }
 
 .results {
-  color: #52afec;
+  color: #2699fb;
   text-align: center;
   cursor: pointer;
 }
@@ -26,12 +28,12 @@ body {
 }
 
 .title {
-  color: #52afec;
+  color: #2699fb;
   text-align: center;
 }
 
 .text-blue {
-  color: #52afec;
+  color: #2699fb;
   text-align: center;
   cursor: pointer;
 }
