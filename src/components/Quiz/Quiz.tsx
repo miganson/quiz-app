@@ -35,10 +35,6 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       setExiting(false);
       setTimeout(() => {
         setExiting(true);
-        setTimeout(() => {
-          setIsRoundTitleVisible(false);
-          setAdvanceCheck(true);
-        }, 200);
       }, 2000);
     }
   }, [isRoundTitleVisible]);
@@ -47,7 +43,9 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     if (exiting) {
       setTimeout(() => {
         setExiting(false);
+        setAdvanceCheck(true);
         if (advanceCheck) {
+          setIsRoundTitleVisible(false);
           advanceQuestionOrRound();
         }
       }, 200);
