@@ -15,6 +15,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const { score, setScore } = useScore();
   const [isRoundTitleVisible, setIsRoundTitleVisible] = useState(true);
   const { userResponses, setUserResponses } = useUserResponses();
+  const [advanceCheck, setAdvanceCheck] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +32,14 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
 
   useEffect(() => {
     if (isRoundTitleVisible) {
-      setTimeout(() => setIsRoundTitleVisible(false), 2000);
+      setExiting(false);
+      setTimeout(() => {
+        setExiting(true);
+        setTimeout(() => {
+          setIsRoundTitleVisible(false);
+          setAdvanceCheck(true);
+        }, 200);
+      }, 2000);
     }
   }, [isRoundTitleVisible]);
 
@@ -39,8 +47,10 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     if (exiting) {
       setTimeout(() => {
         setExiting(false);
-        advanceQuestionOrRound();
-      }, 200); // This should match the duration of your slide out animation
+        if (advanceCheck) {
+          advanceQuestionOrRound();
+        }
+      }, 200);
     }
   }, [exiting]);
 
@@ -134,7 +144,6 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     questionsOrRounds: (Question | NestedQuestion)[],
     roundIndex = 0
   ) => {
-    //check if there are rounds to show what round it is before the questions are shown.
     if (isRoundTitleVisible && "round_title" in questionsOrRounds[roundIndex]) {
       return (
         <div className="roundTitle">
