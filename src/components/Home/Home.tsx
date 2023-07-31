@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import numeral from "numeral";
 import "./Home.css";
 import { HomeProps } from "../../types/quizInterfaces";
@@ -9,8 +9,10 @@ import * as numberToWords from "number-to-words";
 
 export const Home: React.FC<HomeProps> = ({ data }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setScore } = useScore();
   const { setUserResponses } = useUserResponses();
+  const [exiting, setExiting] = useState(false);
 
   const handleButtonClick = (activityOrder: number) => {
     if (data) {
@@ -21,14 +23,22 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
       if (activity) {
         setScore(0); // reset the score
         setUserResponses([]); // reset the userResponses
-        navigate("/quiz/" + activity.order);
+        setExiting(true);
+        setTimeout(() => navigate("/quiz/" + activity.order), 500);
       }
     }
   };
 
   const handleResultsClick = () => {
-    navigate("/score");
+    setExiting(true);
+    setTimeout(() => navigate("/score"), 500);
   };
+
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setExiting(false);
+    }
+  }, [location.pathname]);
 
   const capitalizeWords = (str: string) => {
     return str
@@ -41,7 +51,7 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
     data && data.activities ? Math.max(5, data.activities.length) : 5;
 
   return (
-    <div className="home-container">
+    <div className={`home-container ${exiting ? "slide-out" : "slide-in"}`}>
       <div className="line">
         <div className="text-container">
           <h3 className="title">CAE</h3>

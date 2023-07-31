@@ -13,6 +13,14 @@ body {
   background-color: white;
 }
 
+.home-container.slide-in {
+  animation: slideIn 0.5s ease-in-out forwards;
+}
+
+.home-container.slide-out {
+  animation: slideOut 0.5s ease-in-out forwards;
+}
+
 .line {
   border-bottom: 1px solid #bce0fd;
 }
@@ -42,4 +50,22 @@ body {
   color: gray;
   text-align: center;
   cursor: not-allowed;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(500%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-500%);
+  }
 }
