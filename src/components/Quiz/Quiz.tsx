@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   QuizProps,
   Activity,
@@ -17,14 +17,32 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const { userResponses, setUserResponses } = useUserResponses();
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const [exiting, setExiting] = useState(false);
   const { activityId } = useParams();
   const activityIdAsNumber = activityId ? parseInt(activityId) : undefined;
+
+  useEffect(() => {
+    // On component mount or update
+    if (location.pathname.includes("/quiz")) {
+      setExiting(false);
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (isRoundTitleVisible) {
       setTimeout(() => setIsRoundTitleVisible(false), 2000);
     }
   }, [isRoundTitleVisible]);
+
+  useEffect(() => {
+    if (exiting) {
+      setTimeout(() => {
+        setExiting(false);
+        advanceQuestionOrRound();
+      }, 200); // This should match the duration of your slide out animation
+    }
+  }, [exiting]);
 
   if (!data) {
     navigate("/");
@@ -67,6 +85,13 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       : [userResponse];
 
     setUserResponses(updatedUserResponses);
+
+    setExiting(true);
+  };
+
+  const advanceQuestionOrRound = () => {
+    const questionsOrRoundsArray = desiredActivity?.questions ?? [];
+    const isRoundsArray = "round_title" in (questionsOrRoundsArray[0] || {});
 
     // to check if rounds Array or straight questions Array without rounds
     if (isRoundsArray) {
@@ -140,7 +165,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   };
 
   return (
-    <div className="container">
+    <div className={`container ${exiting ? "slide-out" : "slide-in"}`}>
       {desiredActivity && (
         <div>
           <h3 className="activityName">
