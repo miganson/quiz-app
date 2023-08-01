@@ -73,7 +73,9 @@ const Score = () => {
         </div>
       ))}
       <h2 className="text-padding">Your score: {score}</h2>
-      <button onClick={handleGoHomeClick}>Home</button>
+      <div className="text-container" onClick={handleGoHomeClick}>
+        <h3 className="results">HOME</h3>
+      </div>
     </div>
   );
 };

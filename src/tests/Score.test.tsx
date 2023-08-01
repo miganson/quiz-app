@@ -97,7 +97,7 @@ describe("Score component", () => {
     expect(screen.getAllByText("True").length).toBeGreaterThan(0);
   });
 
-  it("redirects to home when Go home button is clicked", async () => {
+  it("redirects to home when Home div is clicked", async () => {
     const userResponses = [
       { roundTitle: "Round 1", question: "Question 1", is_correct: true },
       { roundTitle: "Round 1", question: "Question 2", is_correct: false },
@@ -124,10 +124,8 @@ describe("Score component", () => {
       }
     );
 
-    const button = screen.getByRole("button", {
-      name: "Home",
-    });
-    fireEvent.click(button); // Click the button
+    const homeDiv = screen.getByText("HOME"); // This will select the HOME div now instead of a button
+    fireEvent.click(homeDiv); // Click the div
 
     expect(await screen.findByText("Home Page")).toBeInTheDocument();
   });

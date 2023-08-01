@@ -101,7 +101,7 @@ describe("Quiz component", () => {
     });
   });
 
-  it("redirects to /score when all questions are answered", () => {
+  it("redirects to /score when all questions are answered", async () => {
     render(
       <MemoryRouter initialEntries={["/quiz/1"]}>
         <Routes>
@@ -111,8 +111,15 @@ describe("Quiz component", () => {
       </MemoryRouter>
     );
 
-    fireEvent.click(screen.getByText("Correct"));
-    fireEvent.click(screen.getByText("Correct"));
-    expect(screen.getByText("Score Page")).toBeInTheDocument();
+    jest.runAllTimers();
+    await screen.findByText("Correct");
+
+    fireEvent.click(screen.getByText("Correct")); // Answer the first question
+    jest.runAllTimers();
+    await screen.findByText("My friend *like listening* to songs in English");
+
+    fireEvent.click(screen.getByText("Correct")); // Answer the second question
+    jest.runAllTimers();
+    await screen.findByText("Score Page");
   });
 });
