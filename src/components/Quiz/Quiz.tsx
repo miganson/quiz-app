@@ -15,7 +15,6 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const { score, setScore } = useScore();
   const [isRoundTitleVisible, setIsRoundTitleVisible] = useState(true);
   const { userResponses, setUserResponses } = useUserResponses();
-  const [advanceCheck, setAdvanceCheck] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,8 +30,7 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-    if (isRoundTitleVisible) {
-      console.log('test1')
+    if (isRoundTitleVisible && isRounds) {
       setTimeout(() => {
         setExiting(true); //slide in animation
         setTimeout(() => {
@@ -44,13 +42,19 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
 
   useEffect(() => {
     if (exiting) {
-      console.log("test2");
-      setTimeout(() => {
-        setExiting(false); //slide out animation
-        if (!isRoundTitleVisible) {
+      if (!isRounds) {
+        setTimeout(() => {
+          setExiting(false); //slide out animation
           advanceQuestionOrRound(); //should only advance if round component is false
-        }
-      }, 500);
+        }, 500);
+      } else {
+        setTimeout(() => {
+          setExiting(false); //slide out animation
+          if (!isRoundTitleVisible) {
+            advanceQuestionOrRound(); //should only advance if round component is false
+          }
+        }, 500);
+      }
     }
   }, [exiting]);
 
