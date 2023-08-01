@@ -32,23 +32,25 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
 
   useEffect(() => {
     if (isRoundTitleVisible) {
-      setExiting(false);
+      console.log('test1')
       setTimeout(() => {
-        setExiting(true);
+        setExiting(true); //slide in animation
+        setTimeout(() => {
+          setIsRoundTitleVisible(false); //will show round component
+        }, 500); //timeout is for slide out animation time
       }, 2000);
     }
   }, [isRoundTitleVisible]);
 
   useEffect(() => {
     if (exiting) {
+      console.log("test2");
       setTimeout(() => {
-        setExiting(false);
-        setAdvanceCheck(true);
-        if (advanceCheck) {
-          setIsRoundTitleVisible(false);
-          advanceQuestionOrRound();
+        setExiting(false); //slide out animation
+        if (!isRoundTitleVisible) {
+          advanceQuestionOrRound(); //should only advance if round component is false
         }
-      }, 200);
+      }, 500);
     }
   }, [exiting]);
 
@@ -60,8 +62,6 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const desiredActivity: Activity | undefined = data.activities.find(
     (activity) => activity.order === activityIdAsNumber
   );
-
-  console.log(desiredActivity);
 
   const questionsOrRounds = desiredActivity?.questions ?? [];
   const isRounds = "round_title" in (questionsOrRounds[0] || {});
