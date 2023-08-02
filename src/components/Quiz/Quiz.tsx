@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   QuizProps,
@@ -15,12 +15,19 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
   const { score, setScore } = useScore();
   const [isRoundTitleVisible, setIsRoundTitleVisible] = useState(true);
   const { userResponses, setUserResponses } = useUserResponses();
+  const [hasRendered, setHasRendered] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const [exiting, setExiting] = useState(false);
   const { activityId } = useParams();
   const activityIdAsNumber = activityId ? parseInt(activityId) : undefined;
+  const desiredActivity: Activity | undefined = data.activities.find(
+    (activity) => activity.order === activityIdAsNumber
+  );
+
+  const questionsOrRounds = desiredActivity?.questions ?? [];
+  const isRounds = "round_title" in (questionsOrRounds[0] || {});
 
   useEffect(() => {
     // On component mount or update
@@ -28,6 +35,13 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       setExiting(false);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      // this is to cancel adnvancing of rounds on load
+      setHasRendered(true);
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     if (isRoundTitleVisible && isRounds) {
@@ -38,7 +52,44 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
         }, 500); //timeout is for slide out animation time
       }, 2000);
     }
-  }, [isRoundTitleVisible]);
+  }, [isRoundTitleVisible, isRounds]);
+
+  const advanceQuestionOrRound = useCallback(() => {
+    const questionsOrRoundsArray = desiredActivity?.questions ?? [];
+    const isRoundsArray = "round_title" in (questionsOrRoundsArray[0] || {});
+
+    // to check if rounds Array or straight questions Array without rounds
+    if (isRoundsArray) {
+      const currentRound = questionsOrRoundsArray[
+        currentRoundIndex
+      ] as NestedQuestion;
+      const questions = currentRound?.questions ?? [];
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else if (currentRoundIndex < questionsOrRoundsArray.length - 1) {
+        //once all questions are answered in current round, bring index back to 0 and increase round index to move to next round
+        setCurrentRoundIndex(currentRoundIndex + 1);
+        setCurrentQuestionIndex(0);
+        setIsRoundTitleVisible(true); // Set the round title to visible for the next round
+      } else {
+        // Navigate to score after all rounds are passed through
+        navigate("/score");
+      }
+    } else {
+      const questions = questionsOrRoundsArray as Question[];
+      if (currentQuestionIndex < questions.length - 1) {
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+      } else {
+        // Pass the updated user responses to the "/score" page
+        navigate("/score");
+      }
+    }
+  }, [
+    currentQuestionIndex,
+    currentRoundIndex,
+    desiredActivity?.questions,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (exiting) {
@@ -50,25 +101,26 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
       } else {
         setTimeout(() => {
           setExiting(false); //slide out animation
-          if (!isRoundTitleVisible) {
+          console.log("test1", isRoundTitleVisible);
+          if (!isRoundTitleVisible && hasRendered) {
+            console.log("test12", isRoundTitleVisible);
             advanceQuestionOrRound(); //should only advance if round component is false
           }
         }, 500);
       }
     }
-  }, [exiting]);
+  }, [
+    exiting,
+    advanceQuestionOrRound,
+    isRoundTitleVisible,
+    isRounds,
+    hasRendered,
+  ]);
 
   if (!data) {
     navigate("/");
     return null;
   }
-
-  const desiredActivity: Activity | undefined = data.activities.find(
-    (activity) => activity.order === activityIdAsNumber
-  );
-
-  const questionsOrRounds = desiredActivity?.questions ?? [];
-  const isRounds = "round_title" in (questionsOrRounds[0] || {});
 
   const handleAnswer = (isCorrect: boolean) => {
     const updatedScore = isCorrect ? (score ?? 0) + 1 : score ?? 0;
@@ -99,38 +151,6 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     setUserResponses(updatedUserResponses);
 
     setExiting(true);
-  };
-
-  const advanceQuestionOrRound = () => {
-    const questionsOrRoundsArray = desiredActivity?.questions ?? [];
-    const isRoundsArray = "round_title" in (questionsOrRoundsArray[0] || {});
-
-    // to check if rounds Array or straight questions Array without rounds
-    if (isRoundsArray) {
-      const currentRound = questionsOrRoundsArray[
-        currentRoundIndex
-      ] as NestedQuestion;
-      const questions = currentRound?.questions ?? [];
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-      } else if (currentRoundIndex < questionsOrRoundsArray.length - 1) {
-        //once all questions are answered in current round, bring index back to 0 and increase round index to move to next round
-        setCurrentRoundIndex(currentRoundIndex + 1);
-        setCurrentQuestionIndex(0);
-        setIsRoundTitleVisible(true); // Set the round title to visible for the next round
-      } else {
-        // Navigate to score after all rounds are passed through
-        navigate("/score");
-      }
-    } else {
-      const questions = questionsOrRoundsArray as Question[];
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-      } else {
-        // Pass the updated user responses to the "/score" page
-        navigate("/score");
-      }
-    }
   };
 
   const getCurrentQuestion = (): Question | undefined => {
@@ -173,7 +193,9 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
     return (
       <div>
         <h2 className="questionNumber">Q: {currentQuestionIndex + 1}</h2>
-        <p className="question">{renderTextWithBold(currentQuestion?.stimulus ?? "")}</p>
+        <p className="question">
+          {renderTextWithBold(currentQuestion?.stimulus ?? "")}
+        </p>
         <div className="answers">
           <div
             onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}
