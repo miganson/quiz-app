@@ -3,7 +3,7 @@
   margin: 0 auto;
   border: 1px solid #bce0fd;
   box-sizing: border-box;
-  color: #2699fb; /* Set the text color for the entire container */
+  color: #2699fb;
   background-color: white;
 }
 
@@ -14,10 +14,6 @@
 .roundTitle {
   padding: 20px;
   text-align: left;
-}
-
-.activityName {
-  /* Other unique styles for .activityName go here */
 }
 
 .questionNumber {
@@ -34,17 +30,12 @@
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
-  cursor: pointer; /* Change the cursor when hovering over the answers */
+  cursor: pointer;
 }
 
 .answers div {
-  /* Styling for the clickable words */
   border: none;
   background: none;
-}
-
-.roundTitle {
-  /* Add additional styles for roundTitle here if needed */
 }
 
 .container.slide-in {
@@ -57,7 +48,7 @@
 
 @keyframes slideIn {
   0% {
-    transform: translateX(100%);
+    transform: translateX(500%);
   }
   100% {
     transform: translateX(0);
@@ -69,6 +60,6 @@
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-500%);
   }
 }

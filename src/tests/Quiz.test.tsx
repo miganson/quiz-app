@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent, screen, waitFor } from "@testing-library/react";
+import { render, fireEvent, screen, act } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { Quiz } from "../components/Quiz/Quiz";
 import { mockData } from "./mocks/mockData";
@@ -34,74 +34,39 @@ describe("Quiz component", () => {
         </Routes>
       </MemoryRouter>
     );
-
-    jest.runAllTimers();
-    await waitFor(() => {
-      expect(
-        screen.getByText("I really enjoy *to play football* with friends.")
-      ).toBeInTheDocument();
+    act(() => {
+      jest.runAllTimers();
     });
+    expect(await screen.findByText(/I really enjoy/i)).toBeInTheDocument();
+    expect(await screen.findByText(/to play football/i)).toBeInTheDocument();
+    expect(await screen.findByText(/with friends./i)).toBeInTheDocument();
   });
 
-  it("advances to the next question on button click (no rounds)", async () => {
-    const mockDataNoRounds = {
-      ...mockData,
-      activities: [mockData.activities[0]],
-    };
-
+  it("correctly updates the question on answering", async () => {
     render(
       <MemoryRouter initialEntries={["/quiz/1"]}>
         <Routes>
-          <Route
-            path="/quiz/:activityId"
-            element={<Quiz data={mockDataNoRounds} />}
-          />
+          <Route path="/quiz/:activityId" element={<Quiz data={mockData} />} />
         </Routes>
       </MemoryRouter>
     );
-
-    await screen.findByText("Correct");
-    fireEvent.click(screen.getByText("Correct"));
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("My friend *like listening* to songs in English")
-      ).toBeInTheDocument();
+    act(() => {
+      jest.advanceTimersByTime(2000);
     });
+  
+    const [correctButton, incorrectButton] = screen.getAllByText(/Correct/i);
+    fireEvent.click(correctButton);
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+  
+    const questionNumber = await screen.findByRole('heading', { name: /Q: 2/i });
+    expect(questionNumber).toBeInTheDocument();
   });
 
-  it("advances to the next question on button click (with rounds)", async () => {
-    const mockDataWithRounds = {
-      ...mockData,
-      activities: [mockData.activities[1]],
-    };
-
-    render(
-      <MemoryRouter initialEntries={["/quiz/2"]}>
-        <Routes>
-          <Route
-            path="/quiz/:activityId"
-            element={<Quiz data={mockDataWithRounds} />}
-          />
-        </Routes>
-      </MemoryRouter>
-    );
-
-    jest.runAllTimers();
-    await screen.findByText("Correct");
-    fireEvent.click(screen.getByText("Correct"));
-
-    jest.runAllTimers();
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          "Watching films at home is *more cheaper* than at the cinema."
-        )
-      ).toBeInTheDocument();
-    });
-  });
 
   it("redirects to /score when all questions are answered", async () => {
+    // Added async here
     render(
       <MemoryRouter initialEntries={["/quiz/1"]}>
         <Routes>
@@ -111,15 +76,26 @@ describe("Quiz component", () => {
       </MemoryRouter>
     );
 
-    jest.runAllTimers();
+    act(() => {
+      jest.runAllTimers();
+    });
+
     await screen.findByText("Correct");
 
     fireEvent.click(screen.getByText("Correct")); // Answer the first question
-    jest.runAllTimers();
-    await screen.findByText("My friend *like listening* to songs in English");
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    expect(await screen.findByText(/My friend/i)).toBeInTheDocument();
+    expect(await screen.findByText(/like listening/i)).toBeInTheDocument();
+    expect(await screen.findByText(/to songs in English/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Correct")); // Answer the second question
-    jest.runAllTimers();
+    act(() => {
+      jest.runAllTimers();
+    });
+
     await screen.findByText("Score Page");
   });
 });

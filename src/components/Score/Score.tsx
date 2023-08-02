@@ -5,8 +5,8 @@ import "./Score.css";
 import React, { useState, useEffect } from "react";
 
 const Score = () => {
-  const { score } = useScore(); // use context hook to get score
-  const { userResponses } = useUserResponses(); // use context hook to get userResponses
+  const { score } = useScore();
+  const { userResponses } = useUserResponses();
   const navigate = useNavigate();
   const location = useLocation();
   const [exiting, setExiting] = useState(false);
@@ -21,18 +21,18 @@ const Score = () => {
       setExiting(false);
     }
   }, [location.pathname]);
-
   // This helper function will return responses grouped by round titles
   const getResponsesGroupedByRound = () => {
     const groupedResponses = userResponses
       ? (userResponses as UserResponse[]).reduce<{
           [key: string]: UserResponse[];
         }>((acc, response: UserResponse) => {
-          const key = response.roundTitle;
-          if (!acc[key]) {
-            acc[key] = [];
+          const roundTitle = response.roundTitle;
+          if (!acc[roundTitle]) {
+            acc[roundTitle] = [];
           }
-          acc[key].push(response);
+          acc[roundTitle].push(response);
+
           return acc;
         }, {})
       : {};
@@ -52,26 +52,28 @@ const Score = () => {
     <div className={`centered-container ${exiting ? "slide-out" : "slide-in"}`}>
       <h2 className="text-padding">Activity: {activityNumber}</h2>
       <h1 className="text-padding">Results</h1>
+      <div className="scrollable-container">
+        {Object.keys(responsesGroupedByRound).map((roundTitle) => (
+          <div key={roundTitle}>
+            <h2 className="round-padding">{roundTitle}</h2>
+            {responsesGroupedByRound[roundTitle].map(
+              (response: UserResponse, index: number) => (
+                <div className="question-response-container" key={index}>
+                  <p className="text-padding">Q{index + 1}</p>
+                  <span className="bold-text text-padding">
+                    {response.isUserAnswerCorrect
+                      ? "Correct"
+                      : response.is_correct
+                      ? "True"
+                      : "False"}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+        ))}
+      </div>
 
-      {Object.keys(responsesGroupedByRound).map((roundTitle) => (
-        <div key={roundTitle}>
-          <h2 className="text-padding">{roundTitle}</h2>
-          {responsesGroupedByRound[roundTitle].map(
-            (response: UserResponse, index: number) => (
-              <div className="question-response-container" key={index}>
-                <p className="text-padding">Q{index + 1}</p>
-                <span className="bold-text text-padding">
-                  {response.isUserAnswerCorrect
-                    ? "Correct"
-                    : response.is_correct
-                    ? "True"
-                    : "False"}
-                </span>
-              </div>
-            )
-          )}
-        </div>
-      ))}
       <h2 className="text-padding">Your score: {score}</h2>
       <div className="text-container" onClick={handleGoHomeClick}>
         <h3 className="results">HOME</h3>

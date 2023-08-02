@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import numeral from "numeral";
 import "./Home.css";
 import { HomeProps } from "../../types/quizInterfaces";
 import { useScore, useUserResponses } from "../../context/QuizContext";
@@ -13,6 +12,8 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
   const { setScore } = useScore();
   const { setUserResponses } = useUserResponses();
   const [exiting, setExiting] = useState(false);
+  const { userResponses } = useUserResponses();
+
 
   const handleButtonClick = (activityOrder: number) => {
     if (data) {
@@ -21,8 +22,8 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
       );
 
       if (activity) {
-        setScore(0); // reset the score
-        setUserResponses([]); // reset the userResponses
+        setScore(0);
+        setUserResponses([]);
         setExiting(true);
         setTimeout(() => navigate("/quiz/" + activity.order), 500);
       }
@@ -79,8 +80,21 @@ export const Home: React.FC<HomeProps> = ({ data }) => {
         );
       })}
 
-      <div className="text-container" onClick={handleResultsClick}>
-        <h3 className="results">RESULTS</h3>
+      <div
+        className="text-container"
+        onClick={() =>
+          userResponses && userResponses.length > 0 && handleResultsClick()
+        }
+      >
+        <h4
+          className={
+            userResponses && userResponses.length > 0
+              ? "results"
+              : "results-disabled"
+          }
+        >
+          RESULTS
+        </h4>
       </div>
     </div>
   );

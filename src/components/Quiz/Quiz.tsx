@@ -155,12 +155,25 @@ export const Quiz: React.FC<QuizProps> = ({ data }) => {
         </div>
       );
     }
+    const renderTextWithBold = (text: string) => {
+      const textParts = text.split("*");
+
+      return textParts.map((part, index) => {
+        if (index % 2 === 0) {
+          // Even indices are not wrapped with <strong>, wrap them with <span> to provide keys
+          return <span key={index}>{part}</span>;
+        } else {
+          // Odd indices are wrapped with <strong>
+          return <strong key={index}>{part}</strong>;
+        }
+      });
+    };
 
     const currentQuestion = getCurrentQuestion();
     return (
       <div>
         <h2 className="questionNumber">Q: {currentQuestionIndex + 1}</h2>
-        <p className="question">{currentQuestion?.stimulus}</p>
+        <p className="question">{renderTextWithBold(currentQuestion?.stimulus ?? "")}</p>
         <div className="answers">
           <div
             onClick={() => handleAnswer(currentQuestion?.is_correct ?? false)}

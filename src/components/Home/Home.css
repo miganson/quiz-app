@@ -47,7 +47,13 @@ body {
 }
 
 .text-gray {
-  color: gray;
+  color: #d4d4d4;
+  text-align: center;
+  cursor: not-allowed;
+}
+
+.results-disabled {
+  color: #d4d4d4;
   text-align: center;
   cursor: not-allowed;
 }
