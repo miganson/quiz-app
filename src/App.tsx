@@ -9,7 +9,11 @@ function App() {
   const [quizData, setQuizData] = useState<any>(null);
 
   useEffect(() => {
-    fetch("https://s3.eu-west-2.amazonaws.com/interview.mock.data/payload.json")
+    const API_URL = process.env.REACT_APP_API_URL;
+    if (!API_URL) {
+      throw new Error('API is not defined');
+    }
+    fetch(API_URL)
       .then((response) => response.json())
       .then((data) => setQuizData(data))
       .catch((error) => console.log(error));
