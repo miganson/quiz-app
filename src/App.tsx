@@ -8,11 +8,19 @@ import { QuizProvider } from "./context/QuizContext";
 function App() {
   const [quizData, setQuizData] = useState<any>(null);
 
+  // useEffect(() => {
+  //   const API_URL = process.env.REACT_APP_API_URL;
+  //   if (!API_URL) {
+  //     throw new Error('API is not defined');
+  //   }
+  //   fetch(API_URL)
+  //     .then((response) => response.json())
+  //     .then((data) => setQuizData(data))
+  //     .catch((error) => console.log(error));
+  // }, []);
+
   useEffect(() => {
-    const API_URL = process.env.REACT_APP_API_URL;
-    if (!API_URL) {
-      throw new Error('API is not defined');
-    }
+    const API_URL = `https://s3.eu-west-2.amazonaws.com/interview.mock.data/payload.json`;
     fetch(API_URL)
       .then((response) => response.json())
       .then((data) => setQuizData(data))
