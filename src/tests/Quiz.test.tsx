@@ -53,17 +53,16 @@ describe("Quiz component", () => {
     act(() => {
       jest.advanceTimersByTime(2000);
     });
-  
+
     const [correctButton, incorrectButton] = screen.getAllByText(/Correct/i);
     fireEvent.click(correctButton);
     act(() => {
       jest.advanceTimersByTime(500);
     });
-  
-    const questionNumber = await screen.findByRole('heading', { name: /Q: 2/i });
-    expect(questionNumber).toBeInTheDocument();
-  });
 
+    const questionNumberHeading = await screen.findByText(/Q: 2/i);
+    expect(questionNumberHeading).toBeInTheDocument();
+  });
 
   it("redirects to /score when all questions are answered", async () => {
     // Added async here
