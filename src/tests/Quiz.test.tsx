@@ -65,7 +65,6 @@ describe("Quiz component", () => {
   });
 
   it("redirects to /score when all questions are answered", async () => {
-    // Added async here
     render(
       <MemoryRouter initialEntries={["/quiz/1"]}>
         <Routes>

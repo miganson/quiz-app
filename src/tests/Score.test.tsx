@@ -2,9 +2,8 @@ import React from "react";
 import { render as rtlRender, fireEvent, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Score from "../components/Score/Score";
-import { QuizProvider, QuizContext } from "../context/QuizContext";
+import { QuizContext } from "../context/QuizContext";
 
-// This function takes an UI, options and wrapper component and returns render result
 function customRender(
   ui: React.ReactElement,
   { providerProps, ...renderOptions }: any
@@ -124,8 +123,8 @@ describe("Score component", () => {
       }
     );
 
-    const homeDiv = screen.getByText("HOME"); // This will select the HOME div now instead of a button
-    fireEvent.click(homeDiv); // Click the div
+    const homeDiv = screen.getByText("HOME");
+    fireEvent.click(homeDiv);
 
     expect(await screen.findByText("Home Page")).toBeInTheDocument();
   });

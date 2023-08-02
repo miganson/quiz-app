@@ -1,6 +1,7 @@
 .container {
-  width: 500px;
-  margin: 0 auto;
+  width: calc(100vw - 20px); /* Subtracting 20px padding on left and right */
+  max-width: 500px;
+  margin: 20px auto;
   border: 1px solid #bce0fd;
   box-sizing: border-box;
   color: #2699fb;
