@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
+import { useState } from "react";
+
 import Home from "./components/Home/Home";
 import Quiz from "./components/Quiz/Quiz";
 import Score from "./components/Score/Score";
@@ -8,7 +10,7 @@ import { apiData } from "./data";
 
 function App() {
   // const [quizData, setQuizData] = useState<any>(null);
-  const [quizData, setQuizData] = useState<any>(apiData);
+  const [quizData] = useState<any>(apiData);
 
 
   // useEffect(() => {
