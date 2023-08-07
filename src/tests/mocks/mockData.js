@@ -44,7 +44,6 @@ export const mockData = {
                 feedback:
                   "Watching films at home is *cheaper* than at the cinema.",
               },
-              // Additional questions...
             ],
           },
           {

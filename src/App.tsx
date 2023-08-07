@@ -4,9 +4,12 @@ import Home from "./components/Home/Home";
 import Quiz from "./components/Quiz/Quiz";
 import Score from "./components/Score/Score";
 import { QuizProvider } from "./context/QuizContext";
+import { apiData } from "./data";
 
 function App() {
-  const [quizData, setQuizData] = useState<any>(null);
+  // const [quizData, setQuizData] = useState<any>(null);
+  const [quizData, setQuizData] = useState<any>(apiData);
+
 
   // useEffect(() => {
   //   const API_URL = process.env.REACT_APP_API_URL;
@@ -19,13 +22,15 @@ function App() {
   //     .catch((error) => console.log(error));
   // }, []);
 
-  useEffect(() => {
-    const API_URL = `https://s3.eu-west-2.amazonaws.com/interview.mock.data/payload.json`;
-    fetch(API_URL)
-      .then((response) => response.json())
-      .then((data) => setQuizData(data))
-      .catch((error) => console.log(error));
-  }, []);
+  // useEffect(() => {
+  //   const API_URL = `https://s3.eu-west-2.amazonaws.com/interview.mock.data/payload.json`;
+  //   fetch(API_URL)
+  //     .then((response) => response.json())
+  //     .then((data) => setQuizData(data))
+  //     .catch((error) => console.log(error));
+  // }, []);
+
+  // setQuizData(apiData);
 
   return (
     <QuizProvider>
